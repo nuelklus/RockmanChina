@@ -85,18 +85,21 @@ WSGI_APPLICATION = 'rockman_logistics.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# Require Supabase connection - no SQLite fallback
-supabase_url = os.getenv('SUPABASE_DATABASE_URL')
+# Try Supabase URL first, fallback to local SQLite for development
+supabase_url = os.getenv('SUPABASE_DATABASE_URL') or os.getenv('SUPABASE_URL')
 
-if not supabase_url or not supabase_url.startswith('postgresql://'):
-    raise ValueError(
-        "SUPABASE_DATABASE_URL environment variable is required and must be a valid PostgreSQL connection string. "
-        "Please set it in your environment or .env file."
-    )
-
-try:
+if supabase_url and supabase_url.startswith('postgresql://'):
+    # Production: Use Supabase PostgreSQL
     DATABASES = {
         'default': dj_database_url.parse(supabase_url)
+    }
+else:
+    # Development: Use SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
     print(f"Connected to Supabase database: {supabase_url.split('@')[1] if '@' in supabase_url else 'Unknown'}")
 except Exception as e:
