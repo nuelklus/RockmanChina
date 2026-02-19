@@ -1,0 +1,774 @@
+{
+  "info": {
+    "name": "Rockman Logistics API",
+    "description": "Complete API collection for Rockman Logistics Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "Staff Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Staff Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Staff Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/profile/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "profile", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Staff User (Registration)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"username\": \"newstaff\",\n    \"email\": \"newstaff@example.com\",\n    \"first_name\": \"New\",\n    \"last_name\": \"Staff\",\n    \"password\": \"newpass123\"\n  },\n  \"staff\": {\n    \"role\": \"operator\",\n    \"department\": \"Operations\",\n    \"phone\": \"1234567890\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/staff/create_staff/",
+              "host": ["{{base_url}}"],
+              "path": ["staff", "create_staff", ""]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints for staff users"
+    },
+    {
+      "name": "👥 Staff Management",
+      "item": [
+        {
+          "name": "List All Staff",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/staff/",
+              "host": ["{{base_url}}"],
+              "path": ["staff", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Staff by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/staff/1/",
+              "host": ["{{base_url}}"],
+              "path": ["staff", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Staff",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user\": {\n    \"username\": \"admin\",\n    \"email\": \"admin@rockmanlogistics.com\",\n    \"first_name\": \"Super\",\n    \"last_name\": \"Admin\"\n  },\n  \"staff\": {\n    \"role\": \"admin\",\n    \"department\": \"IT\",\n    \"phone\": \"1234567890\",\n    \"employee_id\": \"ADMIN001\",\n    \"is_active_staff\": true\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/staff/1/",
+              "host": ["{{base_url}}"],
+              "path": ["staff", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Staff",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/staff/4/",
+              "host": ["{{base_url}}"],
+              "path": ["staff", "4", ""]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "CRUD operations for staff management"
+    },
+    {
+      "name": "🛍️ Goods Categories",
+      "item": [
+        {
+          "name": "List All Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/categories/",
+              "host": ["{{base_url}}"],
+              "path": ["categories", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Electronics\",\n  \"description\": \"Electronic items and gadgets\",\n  \"unit_price\": \"99.99\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/categories/",
+              "host": ["{{base_url}}"],
+              "path": ["categories", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/categories/1/",
+              "host": ["{{base_url}}"],
+              "path": ["categories", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Electronics\",\n  \"description\": \"Updated description\",\n  \"unit_price\": \"149.99\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/categories/1/",
+              "host": ["{{base_url}}"],
+              "path": ["categories", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/categories/1/",
+              "host": ["{{base_url}}"],
+              "path": ["categories", "1", ""]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Manage goods categories"
+    },
+    {
+      "name": "👤 Customers",
+      "item": [
+        {
+          "name": "List All Customers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customers/",
+              "host": ["{{base_url}}"],
+              "path": ["customers", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"1234567890\",\n  \"address\": \"123 Main St, City, State\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/customers/",
+              "host": ["{{base_url}}"],
+              "path": ["customers", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customers/1/",
+              "host": ["{{base_url}}"],
+              "path": ["customers", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"phone\": \"0987654321\",\n  \"address\": \"456 Oak Ave, City, State\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/customers/1/",
+              "host": ["{{base_url}}"],
+              "path": ["customers", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/customers/1/",
+              "host": ["{{base_url}}"],
+              "path": ["customers", "1", ""]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Manage customer information"
+    },
+    {
+      "name": "📦 Shipments",
+      "item": [
+        {
+          "name": "List All Shipments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/shipments/",
+              "host": ["{{base_url}}"],
+              "path": ["shipments", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Shipment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tracking_number\": \"TRK123456\",\n  \"origin\": \"Warehouse A\",\n  \"destination\": \"Store B\",\n  \"status\": \"in_transit\",\n  \"estimated_delivery\": \"2026-02-15T10:00:00Z\",\n  \"customer\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/shipments/",
+              "host": ["{{base_url}}"],
+              "path": ["shipments", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Shipment by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/shipments/1/",
+              "host": ["{{base_url}}"],
+              "path": ["shipments", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Shipment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tracking_number\": \"TRK123456\",\n  \"origin\": \"Warehouse A\",\n  \"destination\": \"Store B\",\n  \"status\": \"delivered\",\n  \"estimated_delivery\": \"2026-02-15T10:00:00Z\",\n  \"customer\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/shipments/1/",
+              "host": ["{{base_url}}"],
+              "path": ["shipments", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Shipment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/shipments/1/",
+              "host": ["{{base_url}}"],
+              "path": ["shipments", "1", ""]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Manage shipments and tracking"
+    },
+    {
+      "name": "🧾 Receipts",
+      "item": [
+        {
+          "name": "List All Receipts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/receipts/",
+              "host": ["{{base_url}}"],
+              "path": ["receipts", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Receipt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receipt_number\": \"RCP-2026-001\",\n  \"customer\": 1,\n  \"notes\": \"Sample receipt\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/receipts/",
+              "host": ["{{base_url}}"],
+              "path": ["receipts", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Receipt by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/receipts/1/",
+              "host": ["{{base_url}}"],
+              "path": ["receipts", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Receipt",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receipt_number\": \"RCP-2026-001\",\n  \"customer\": 1,\n  \"notes\": \"Updated receipt notes\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/receipts/1/",
+              "host": ["{{base_url}}"],
+              "path": ["receipts", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Receipt",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/receipts/1/",
+              "host": ["{{base_url}}"],
+              "path": ["receipts", "1", ""]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Manage receipts and billing"
+    },
+    {
+      "name": "📋 Receipt Items",
+      "item": [
+        {
+          "name": "List All Receipt Items",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/receipt-items/",
+              "host": ["{{base_url}}"],
+              "path": ["receipt-items", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Receipt Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receipt\": 1,\n  \"category\": 1,\n  \"description\": \"Sample item\",\n  \"quantity\": 5,\n  \"unit_price\": \"99.99\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/receipt-items/",
+              "host": ["{{base_url}}"],
+              "path": ["receipt-items", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Receipt Item by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/receipt-items/1/",
+              "host": ["{{base_url}}"],
+              "path": ["receipt-items", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Receipt Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receipt\": 1,\n  \"category\": 1,\n  \"description\": \"Updated item\",\n  \"quantity\": 10,\n  \"unit_price\": \"149.99\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/receipt-items/1/",
+              "host": ["{{base_url}}"],
+              "path": ["receipt-items", "1", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Receipt Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Token {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/receipt-items/1/",
+              "host": ["{{base_url}}"],
+              "path": ["receipt-items", "1", ""]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Manage individual receipt items"
+    }
+  ]
+}
