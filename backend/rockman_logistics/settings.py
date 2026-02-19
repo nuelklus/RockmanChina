@@ -90,9 +90,13 @@ supabase_url = os.getenv('SUPABASE_DATABASE_URL') or os.getenv('SUPABASE_URL')
 
 if supabase_url and supabase_url.startswith('postgresql://'):
     # Production: Use Supabase PostgreSQL
-    DATABASES = {
-        'default': dj_database_url.parse(supabase_url)
-    }
+    try:
+        DATABASES = {
+            'default': dj_database_url.parse(supabase_url)
+        }
+        print(f"Connected to Supabase database: {supabase_url.split('@')[1] if '@' in supabase_url else 'Unknown'}")
+    except Exception as e:
+        raise ValueError(f"Error parsing Supabase URL '{supabase_url}': {e}")
 else:
     # Development: Use SQLite
     DATABASES = {
@@ -101,9 +105,6 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    print(f"Connected to Supabase database: {supabase_url.split('@')[1] if '@' in supabase_url else 'Unknown'}")
-except Exception as e:
-    raise ValueError(f"Error parsing Supabase URL '{supabase_url}': {e}")
 
 
 # Password validation
