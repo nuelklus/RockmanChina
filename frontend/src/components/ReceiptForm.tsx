@@ -25,6 +25,12 @@ interface Customer {
   is_active?: boolean;
 }
 
+interface CustomerOption {
+  value: number;
+  label: string;
+  __isNew__?: boolean;
+}
+
 interface ReceiptItem {
   id?: number;
   category?: GoodsCategory | null;
@@ -39,10 +45,9 @@ interface ReceiptFormProps {
 }
 
 export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
-  console.log('=== ReceiptForm component rendered ===');
   const [categories, setCategories] = useState<GoodsCategory[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerOption | null>(null);
   const [customerInput, setCustomerInput] = useState('');
   const [receiptItems, setReceiptItems] = useState<ReceiptItem[]>([
     { description: '', cbm: 0, unit_price: 0, total_price: 0 }
@@ -59,9 +64,7 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        console.log('Loading categories from database...');
         const data = await getGoodsCategories();
-        console.log('Categories loaded from DB:', data);
         setCategories(data);
       } catch (error) {
         console.error('Error loading categories:', error);
@@ -70,24 +73,25 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
     loadCategories();
   }, []);
 
-  // Search customers when input changes
+  // Search customers only when user types (no initial load)
   useEffect(() => {
     const searchCustomersDebounce = setTimeout(async () => {
-      try {
-        const data = await searchCustomers(customerInput || '');
-        console.log('Customer search response:', data);
-        setCustomers(data);
-      } catch (error) {
-        console.error('Error searching customers:', error);
+      if (customerInput && customerInput.trim().length >= 2) {
+        try {
+          const data = await searchCustomers(customerInput);
+          setCustomers(Array.isArray(data) ? data : data?.results || []);
+        } catch (error) {
+          console.error('Error searching customers:', error);
+          setCustomers([]);
+        }
       }
-    }, 300);
+    }, 500); // Increased debounce for better performance
 
     return () => clearTimeout(searchCustomersDebounce);
   }, [customerInput]);
 
   // Preserve receipt items when customer changes (don't reset form)
   useEffect(() => {
-    console.log('Customer changed, preserving receipt items:', receiptItems);
     // Don't reset receipt items when customer changes
   }, [selectedCustomer]);
 
@@ -189,12 +193,7 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
 
   // Handle customer creation/selection
   const handleCustomerChange = async (newValue: any, actionMeta: any) => {
-    console.log('=== handleCustomerChange called ===');
-    console.log('newValue:', newValue);
-    console.log('actionMeta:', actionMeta);
-    
     if (actionMeta && actionMeta.action === 'create-option') {
-      console.log('Creating new customer...');
       // Create new customer
       try {
         const customerData = {
@@ -205,9 +204,7 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
           address: '',
           company_registration: ''
         };
-        console.log('Customer data to create:', customerData);
         const newCustomer = await createCustomer(customerData);
-        console.log('New customer created:', newCustomer);
         // Format new customer for CreatableSelect
         const formattedNewCustomer = {
           value: newCustomer.id,
@@ -215,7 +212,10 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
           __isNew__: true
         };
         setSelectedCustomer(formattedNewCustomer);
-        setCustomers(prevCustomers => [...(prevCustomers?.results || prevCustomers || []), formattedNewCustomer]);
+        setCustomers(prevCustomers => {
+          const currentCustomers = Array.isArray(prevCustomers) ? prevCustomers : [];
+          return [...currentCustomers, newCustomer];
+        });
         
         // Show success message
         alert(`Customer "${newCustomer.company_name} (${newCustomer.customer_code})" created successfully!`);
@@ -224,7 +224,6 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
         alert('Error creating customer. Please try again.');
       }
     } else {
-      console.log('Selected existing customer:', newValue);
       setSelectedCustomer(newValue);
     }
   };
@@ -240,20 +239,8 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
     setLoading(true);
     try {
       // Create receipt with all items at once
-      console.log('Selected customer:', selectedCustomer);
-      console.log('Receipt items:', receiptItems);
-      console.log('Receipt items details:', receiptItems.map((item, index) => ({
-        index,
-        category: item.category,
-        categoryId: item.category?.id,
-        description: item.description,
-        cbm: item.cbm,
-        unit_price: item.unit_price
-      })));
-      console.log('Grand total:', grandTotal);
-      
       const receiptData = {
-        customer: selectedCustomer?.value || selectedCustomer?.id || selectedCustomer,
+        customer: selectedCustomer?.value || selectedCustomer,
         total_amount: parseFloat(grandTotal.toFixed(2)), // Round to 2 decimal places
         payment_status: 'pending',
         loading_date: loadingDate || null,
@@ -262,21 +249,18 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
         items: receiptItems
           .filter(item => item.description && item.description.trim() !== '') // Only include items with description
           .map(item => {
-            const categoryId = typeof item.category === 'object' ? item.category.id : item.category;
+            const categoryId = item.category && typeof item.category === 'object' ? item.category.id : item.category;
             return {
               category: categoryId || null,
               description: item.description.trim(),
               cbm: item.cbm || (categoryId ? item.cbm : 1.000), // Default to 1.000 for manual items
-              unit_price: parseFloat(parseFloat(item.unit_price).toFixed(2)) // Parse string to number, then round to 2 decimal places
+              unit_price: parseFloat(parseFloat(String(item.unit_price)).toFixed(2)) // Convert to string, parse to number, then round to 2 decimal places
             };
           })
       };
-      console.log('Sending receipt data:', JSON.stringify(receiptData, null, 2));
       const receipt = await createReceipt(receiptData);
 
       // Store created receipt data for PDF generation
-      console.log('Backend response:', receipt);
-      console.log('Customer data from backend:', receipt.customer);
       setCreatedReceipt({
         ...receipt,
         customer: receipt.customer, // Use customer data from backend response
@@ -297,11 +281,6 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
 
   const generatePDF = async () => {
     if (!createdReceipt) return;
-
-    // Exchange rate (can be made dynamic)
-    const exchangeRate = 7.3; // 1 USD = 7.3 RMB
-    const totalUSD = parseFloat(createdReceipt.total_amount || 0);
-    const totalRMB = (totalUSD * exchangeRate).toFixed(2);
 
     const receiptElement = document.createElement('div');
     receiptElement.style.width = '800px';
@@ -388,8 +367,7 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
       <div style="margin-bottom: 20px;">
         <div style="text-align: right; background-color: #f8f9fa; padding: 15px; border: 2px solid #2c3e50; border-radius: 5px;">
           <h3 style="margin: 0 0 10px 0; color: #2c3e50;">Payment Summary</h3>
-          <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">Total: $${totalUSD.toFixed(2)} / ${totalRMB} RMB</p>
-          <p style="margin: 5px 0; color: #666;">Exchange Rate: 1 USD = ${exchangeRate} RMB</p>
+          <p style="margin: 5px 0; font-size: 16px; font-weight: bold;">Total: $${parseFloat(createdReceipt.total_amount || 0).toFixed(2)} USD</p>
           <p style="margin: 5px 0; color: #666;">Payment Status: <span style="color: ${createdReceipt.payment_status === 'paid' ? '#27ae60' : '#e74c3c'}; font-weight: bold;">${createdReceipt.payment_status.toUpperCase()}</span></p>
         </div>
       </div>
@@ -414,7 +392,6 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
         useCORS: true,
         allowTaint: true,
         logging: false,
-        useCORS: true,
         backgroundColor: '#ffffff'
       });
 
@@ -468,20 +445,11 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
     label: cat.name,
     unit_price: cat.unit_price
   }));
-  
-  console.log('Categories state:', categories);
-  console.log('Category options for dropdown:', categoryOptions);
 
   const customerOptions = Array.isArray(customers) ? customers.map(customer => ({
     value: customer.id,
     label: `${customer.company_name} (${customer.customer_code})`
-  })) : (customers?.results || customers || []).map(customer => ({
-    value: customer.id,
-    label: `${customer.company_name} (${customer.customer_code})`
-  }));
-  
-  console.log('Customer options available:', customerOptions);
-  console.log('Current customer input:', customerInput);
+  })) : [];
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -631,7 +599,7 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
                       Total
                     </label>
                     <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md">
-                      ${parseFloat(item.total_price || 0).toFixed(2)}
+                      ${parseFloat(String(item.total_price || 0)).toFixed(2)}
                     </div>
                   </div>
 
@@ -660,7 +628,7 @@ export default function ReceiptForm({ onReceiptCreated }: ReceiptFormProps) {
           {/* Grand Total */}
           <div className="text-right">
             <div className="text-2xl font-bold">
-              Grand Total: ${parseFloat(grandTotal || 0).toFixed(2)}
+              Grand Total: ${parseFloat(String(grandTotal || 0)).toFixed(2)}
             </div>
           </div>
 

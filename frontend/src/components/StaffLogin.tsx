@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { apiCallWithWakeUp } from '../lib/backendWakeUp';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://rockmanchina.onrender.com';
 
 interface LoginData {
   username: string;
@@ -48,11 +49,13 @@ const StaffLogin: React.FC = () => {
     setError('');
 
     try {
-      // First, authenticate with Django
-      const authResponse = await axios.post(`${API_BASE_URL}/auth/login/`, formData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      // First, authenticate with Django (with wake-up)
+      const authResponse = await apiCallWithWakeUp(async () => {
+        return await axios.post(`${API_BASE_URL}/auth/login/`, formData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
       });
 
       if (authResponse.status === 200) {

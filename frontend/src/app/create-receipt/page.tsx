@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import ReceiptForm from '@/components/ReceiptForm';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://rockmanchina.onrender.com';
 
 interface StaffUser {
   id: number;

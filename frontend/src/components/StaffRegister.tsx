@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import axios from 'axios';
+import { apiCallWithWakeUp } from '../lib/backendWakeUp';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://rockmanchina.onrender.com';
 
 interface StaffRegisterData {
   user: {
@@ -17,6 +18,7 @@ interface StaffRegisterData {
     role: string;
     department: string;
     phone: string;
+    employee_id: string;
   };
 }
 
@@ -33,6 +35,7 @@ const StaffRegister: React.FC = () => {
       role: 'operator',
       department: '',
       phone: '',
+      employee_id: '',
     },
   });
 
@@ -76,7 +79,9 @@ const StaffRegister: React.FC = () => {
     setSuccess('');
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/staff/create_staff/`, formData);
+      const response = await apiCallWithWakeUp(async () => {
+        return await axios.post(`${API_BASE_URL}/staff/create_staff/`, formData);
+      });
       
       if (response.status === 201) {
         setSuccess('Staff user created successfully! You can now login.');

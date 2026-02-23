@@ -16,8 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
+
+def health_check(request):
+    """Simple health check endpoint that doesn't hit database"""
+    return JsonResponse({
+        'status': 'healthy',
+        'message': 'Backend is awake and ready'
+    })
 
 urlpatterns = [
+    path('health/', health_check, name='health_check'),
     path('admin/', admin.site.urls),
     path('', include('logistics.urls')),
 ]

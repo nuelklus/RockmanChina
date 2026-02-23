@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import axios from 'axios';
+import { apiCallWithWakeUp } from '../../lib/backendWakeUp';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'https://rockmanchina.onrender.com';
 
 interface StaffUser {
   id: number;
@@ -54,39 +54,25 @@ const Dashboard: React.FC = () => {
 
   const fetchDashboardStats = async (token: string) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/staff/`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
+      const response = await apiCallWithWakeUp(async () => {
+        return await fetch(`${API_BASE_URL}/staff/`, {
+          headers: {
+            'Authorization': `Token ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
       });
 
-      const customersResponse = await axios.get(`${API_BASE_URL}/customers/`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch dashboard stats');
+      }
 
-      const shipmentsResponse = await axios.get(`${API_BASE_URL}/shipments/`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const receiptsResponse = await axios.get(`${API_BASE_URL}/receipts/`, {
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
+      const data = await response.json();
       setStats({
-        totalStaff: response.data.count || response.data.length,
-        totalCustomers: customersResponse.data.count || customersResponse.data.length,
-        totalShipments: shipmentsResponse.data.count || shipmentsResponse.data.length,
-        totalReceipts: receiptsResponse.data.count || receiptsResponse.data.length,
+        totalStaff: data.total_staff || 0,
+        totalCustomers: data.total_customers || 0,
+        totalShipments: data.total_shipments || 0,
+        totalReceipts: data.total_receipts || 0,
       });
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);

@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { apiCallWithWakeUp } from './backendWakeUp';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://rockmanchina.onrender.com';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -45,30 +46,40 @@ api.interceptors.response.use(
 
 // Goods Categories
 export const getGoodsCategories = async () => {
-  const response = await api.get('/categories/');
-  return response.data;
+  return apiCallWithWakeUp(async () => {
+    const response = await api.get('/categories/');
+    return response.data;
+  });
 };
 
 export const getGoodsCategory = async (id: number) => {
-  const response = await api.get(`/categories/${id}/`);
-  return response.data;
+  return apiCallWithWakeUp(async () => {
+    const response = await api.get(`/categories/${id}/`);
+    return response.data;
+  });
 };
 
 // Customers
 export const searchCustomers = async (search: string) => {
-  const response = await api.get('/customers/', { params: { search } });
-  return response.data;
+  return apiCallWithWakeUp(async () => {
+    const response = await api.get('/customers/', { params: { search } });
+    return response.data;
+  });
 };
 
 export const createCustomer = async (customerData: any) => {
-  const response = await api.post('/customers/create_or_get/', customerData);
-  return response.data;
+  return apiCallWithWakeUp(async () => {
+    const response = await api.post('/customers/create_or_get/', customerData);
+    return response.data;
+  });
 };
 
 // Receipts
 export const createReceipt = async (receiptData: any) => {
-  const response = await api.post('/receipts/', receiptData);
-  return response.data;
+  return apiCallWithWakeUp(async () => {
+    const response = await api.post('/receipts/', receiptData);
+    return response.data;
+  });
 };
 
 export const addReceiptItem = async (receiptId: number, itemData: any) => {
