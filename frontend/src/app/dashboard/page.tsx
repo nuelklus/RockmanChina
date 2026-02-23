@@ -55,7 +55,7 @@ const Dashboard: React.FC = () => {
   const fetchDashboardStats = async (token: string) => {
     try {
       const response = await apiCallWithWakeUp(async () => {
-        return await fetch(`${API_BASE_URL}/staff/`, {
+        return await fetch(`${API_BASE_URL}/staff/dashboard_stats/`, {
           headers: {
             'Authorization': `Token ${token}`,
             'Content-Type': 'application/json',

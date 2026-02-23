@@ -89,6 +89,24 @@ class StaffViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(staff)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def dashboard_stats(self, request):
+        """Get dashboard statistics"""
+        from django.db.models import Count, Q
+        
+        # Get counts
+        total_staff = Staff.objects.filter(is_active_staff=True).count()
+        total_customers = Customer.objects.filter(is_active=True).count()
+        total_shipments = Shipment.objects.count()
+        total_receipts = Receipt.objects.count()
+        
+        return Response({
+            'total_staff': total_staff,
+            'total_customers': total_customers,
+            'total_shipments': total_shipments,
+            'total_receipts': total_receipts
+        })
+
 
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.filter(is_active=True)
